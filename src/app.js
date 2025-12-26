@@ -6,6 +6,7 @@ const {
   getServiceById,
   generateServiceId
 } = require("./registry/serviceRegistry");
+const { startScheduler } = require("./scheduler/scheduler");
 
 const app = express();
 app.use(express.json());
@@ -58,4 +59,5 @@ app.get("/services/:id", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Uptime Monitor running on http://localhost:${PORT}`);
+  startScheduler();
 });
