@@ -1,8 +1,7 @@
 const ServiceState = {
   UP: "UP",
-  SUSPECT: "SUSPECT",
-  DOWN: "DOWN",
-  RECOVERING: "RECOVERING"
+  UNKNOWN: "UNKNOWN",
+  DOWN: "DOWN"
 };
 
 class Service {
@@ -24,7 +23,7 @@ class Service {
     this.failureThreshold = failureThreshold;
     this.successThreshold = successThreshold;
 
-    this.state = ServiceState.UP;
+    this.state = ServiceState.UNKNOWN;
     this.consecutiveFailures = 0;
     this.consecutiveSuccesses = 0;
     this.lastCheckedAt = null;
