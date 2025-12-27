@@ -1,6 +1,7 @@
 const { getAllServices } = require("../registry/serviceRegistry");
 const { performHealthCheck } = require("../checker/healthChecker");
 const { evaluateServiceState } = require("../state/stateEvaluator");
+const { dispatchAlert } = require("../alerts/alertDispatcher");
 
 const SCHEDULER_TICK_MS = 1000;
 
@@ -35,7 +36,29 @@ async function triggerCheck(service) {
 
   const stateChange = evaluateServiceState(service, result);
 
+  if (stateChange.transitioned) {
+    if (stateChange.newStatus === "DOWN") {
+      service.downtimeStartedAt = new Date();
+    }
+
+    if (stateChange.newStatus === "UP") {
+      service.lastDowntime = formatDowntime(
+        service.downtimeStartedAt,
+        new Date()
+      );
+      service.downtimeStartedAt = null;
+    }
+
+    await dispatchAlert(service, stateChange, result);
+  }
+
   logCheckResult(service, result, stateChange);
+}
+
+function formatDowntime(start, end) {
+  if (!start) return "N/A";
+  const seconds = Math.floor((end - start) / 1000);
+  return `${seconds} seconds`;
 }
 
 function logCheckResult(service, result, stateChange) {

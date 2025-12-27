@@ -1,9 +1,3 @@
-const ServiceState = {
-  UP: "UP",
-  UNKNOWN: "UNKNOWN",
-  DOWN: "DOWN"
-};
-
 class Service {
   constructor({
     id,
@@ -12,7 +6,13 @@ class Service {
     checkInterval,
     timeout,
     failureThreshold,
-    successThreshold
+    successThreshold,
+    alertEmail,
+    webhookUrl,
+    state = "UNKNOWN",
+    lastCheckedAt = null,
+    downtimeStartedAt = null,
+    lastDowntime = "N/A"
   }) {
     this.id = id;
     this.name = name;
@@ -22,12 +22,16 @@ class Service {
     this.timeout = timeout;
     this.failureThreshold = failureThreshold;
     this.successThreshold = successThreshold;
+    this.alertEmail = alertEmail;
+    this.webhookUrl = webhookUrl;
 
-    this.state = ServiceState.UNKNOWN;
+    this.state = state;
     this.consecutiveFailures = 0;
     this.consecutiveSuccesses = 0;
-    this.lastCheckedAt = null;
+    this.lastCheckedAt = lastCheckedAt;
+    this.downtimeStartedAt = downtimeStartedAt;
+    this.lastDowntime = lastDowntime;
   }
 }
 
-module.exports = { Service, ServiceState };
+module.exports = { Service };
