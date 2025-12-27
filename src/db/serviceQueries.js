@@ -54,4 +54,34 @@ async function insertService(service) {
   }
 }
 
-module.exports = { insertService };
+async function updateStateChangeInDb(service) {
+  const query = `
+    UPDATE services
+    SET
+      state = $1,
+      last_checked_at = $2,
+      downtime_started_at = $3,
+      last_downtime = $4
+    WHERE id = $5
+  `;
+
+  const values = [
+    service.state,
+    service.lastCheckedAt,
+    service.downtimeStartedAt,
+    service.lastDowntime,
+    service.id
+  ];
+
+  try {
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      throw new Error(`Service not found in DB: ${service.id}`);
+    }
+  } catch (err) {
+    console.error(`❌ Failed to update state for service [${service.id}]`, err);
+  }
+}
+
+module.exports = { insertService, updateStateChangeInDb };

@@ -2,6 +2,7 @@ const { getAllServices } = require("../registry/serviceRegistry");
 const { performHealthCheck } = require("../checker/healthChecker");
 const { evaluateServiceState } = require("../state/stateEvaluator");
 const { dispatchAlert } = require("../alerts/alertDispatcher");
+const { updateStateChangeInDb } = require("../db/serviceQueries");
 
 const SCHEDULER_TICK_MS = 1000;
 
@@ -48,6 +49,8 @@ async function triggerCheck(service) {
       );
       service.downtimeStartedAt = null;
     }
+
+    await updateStateChangeInDb(service);
 
     await dispatchAlert(service, stateChange, result);
   }
