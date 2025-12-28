@@ -36,8 +36,11 @@ SERVICE RECOVERED ✅
 Service: ${service.name}
 URL: ${service.url}
 Time: ${timestamp}
-Downtime: ${service.lastDowntime || "N/A"}
-    `.trim();
+Downtime: ${
+  service.lastDowntime === 0
+    ? "N/A"
+    : `${service.lastDowntime} seconds`
+  }`.trim();
 
     await Promise.allSettled([
       service.alertEmail &&

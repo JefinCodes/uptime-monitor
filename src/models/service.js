@@ -12,7 +12,7 @@ class Service {
     state = "UNKNOWN",
     lastCheckedAt = null,
     downtimeStartedAt = null,
-    lastDowntime = "N/A"
+    lastDowntime = 0
   }) {
     this.id = id;
     this.name = name;

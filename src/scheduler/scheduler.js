@@ -3,6 +3,9 @@ const { performHealthCheck } = require("../checker/healthChecker");
 const { evaluateServiceState } = require("../state/stateEvaluator");
 const { dispatchAlert } = require("../alerts/alertDispatcher");
 const { updateStateChangeInDb } = require("../db/serviceQueries");
+const { saveCheck } = require("../db/checkQueries");
+const { startIncident, resolveIncident } = require("../db/incidentQueries");
+
 
 const SCHEDULER_TICK_MS = 1000;
 
@@ -35,19 +38,24 @@ async function triggerCheck(service) {
 
   const result = await performHealthCheck(service);
 
+  await saveCheck(service, result);
+
   const stateChange = evaluateServiceState(service, result);
 
   if (stateChange.transitioned) {
     if (stateChange.newStatus === "DOWN") {
       service.downtimeStartedAt = new Date();
+      await startIncident(service.id, service.downtimeStartedAt)
     }
 
     if (stateChange.newStatus === "UP") {
+      const resolvedAt = new Date();
       service.lastDowntime = formatDowntime(
         service.downtimeStartedAt,
-        new Date()
+        resolvedAt
       );
       service.downtimeStartedAt = null;
+      await resolveIncident(service.id, resolvedAt, service.lastDowntime);
     }
 
     await updateStateChangeInDb(service);
@@ -59,9 +67,9 @@ async function triggerCheck(service) {
 }
 
 function formatDowntime(start, end) {
-  if (!start) return "N/A";
+  if (!start) return 0;
   const seconds = Math.floor((end - start) / 1000);
-  return `${seconds} seconds`;
+  return seconds;
 }
 
 function logCheckResult(service, result, stateChange) {

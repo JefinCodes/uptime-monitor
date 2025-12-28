@@ -19,7 +19,7 @@ async function runMigrations() {
 
       last_checked_at TIMESTAMPTZ,
       downtime_started_at TIMESTAMPTZ,
-      last_downtime TEXT DEFAULT 'N/A'
+      last_downtime INTEGER DEFAULT 0
     );
   `);
 
