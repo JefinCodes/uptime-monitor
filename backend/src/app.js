@@ -86,7 +86,7 @@ app.get("/services", (req, res) => {
 });
 
 app.get("/services/:id", (req, res) => {
-  const service = getServiceById(Number(req.params.id));
+  const service = getServiceById(req.params.id);
   if (!service) {
     return res.status(404).json({ error: "Service not found" });
   }
