@@ -6,6 +6,7 @@ const { loadServicesIntoMemory } = require("./startup/loadServices");
 const { startScheduler } = require("./scheduler/scheduler");
 const { addService, getAllServices, getServiceById, generateServiceId } = require("./registry/serviceRegistry");
 const { insertService } = require("./db/serviceQueries");
+const { getServiceAnalytics, getIncidentHistory } = require("./db/analyticQueries");
 
 const app = express();
 app.use(express.json());
@@ -67,6 +68,40 @@ app.get("/services/:id", (req, res) => {
     return res.status(404).json({ error: "Service not found" });
   }
   res.json(service);
+});
+
+app.get("/api/services/:serviceId/analytics", async (req, res) => {
+  try{
+    const { serviceId } = req.params;
+    const { from, to } = req.query;
+
+    if (!from || !to) {
+      return res.status(400).json({ error: "from and to are required" });
+    }
+
+    const analytics = await getServiceAnalytics(serviceId, from, to);
+
+    res.json(analytics);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch analytics" });
+  }
+});
+
+app.get("/api/services/:serviceId/incidents", async (req, res) => {
+  try{
+    const { serviceId } = req.params;
+    const { from, to } = req.query;
+
+    if (!from || !to) {
+      return res.status(400).json({ error: "from and to are required" });
+    }
+
+    const incidents = await getIncidentHistory(serviceId, from, to);
+
+    res.json(incidents);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch incidents" });
+  }
 });
 
 async function startup() {
