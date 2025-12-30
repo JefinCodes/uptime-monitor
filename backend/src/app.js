@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const { Service } = require("./models/service");
 const { runMigrations } = require("./db/migrations");
 const { loadServicesIntoMemory } = require("./startup/loadServices");
@@ -9,6 +10,28 @@ const { insertService } = require("./db/serviceQueries");
 const { getServiceAnalytics, getIncidentHistory } = require("./db/analyticQueries");
 
 const app = express();
+
+const allowedOrigins = [
+  "http://localhost:5173",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+    credentials: false
+  })
+);
+
 app.use(express.json());
 
 const PORT = 3000;
