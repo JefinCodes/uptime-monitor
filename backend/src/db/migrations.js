@@ -3,7 +3,7 @@ const pool = require("./database");
 async function runMigrations() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS services (
-      id TEXT PRIMARY KEY,
+      id UUID PRIMARY KEY,
       name TEXT NOT NULL,
       url TEXT NOT NULL,
 

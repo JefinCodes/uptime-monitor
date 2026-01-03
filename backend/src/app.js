@@ -1,11 +1,12 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const { v4: uuidv4 } = require("uuid");
 const { Service } = require("./models/service");
 const { runMigrations } = require("./db/migrations");
 const { loadServicesIntoMemory } = require("./startup/loadServices");
 const { startScheduler } = require("./scheduler/scheduler");
-const { addService, getAllServices, getServiceById, generateServiceId } = require("./registry/serviceRegistry");
+const { addService, getAllServices, getServiceById } = require("./registry/serviceRegistry");
 const { insertService } = require("./db/serviceQueries");
 const { getServiceAnalytics, getIncidentHistory } = require("./db/analyticQueries");
 
@@ -59,7 +60,7 @@ app.post("/services", async (req, res) => {
     }
 
     const service = new Service({
-      id: generateServiceId(),
+      id: uuidv4(),
       name,
       url,
       checkInterval,

@@ -1,6 +1,6 @@
 const pool = require("../db/database");
 const { Service } = require("../models/service");
-const { addService, generateServiceId } = require("../registry/serviceRegistry");
+const { addService } = require("../registry/serviceRegistry");
 
 async function loadServicesIntoMemory() {
   const result = await pool.query(`
@@ -38,8 +38,6 @@ async function loadServicesIntoMemory() {
       downtimeStartedAt: row.downtime_started_at,
       lastDowntime: row.last_downtime
     });
-
-    generateServiceId();
 
     addService(service);
   }
