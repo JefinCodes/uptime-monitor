@@ -26,7 +26,7 @@ async function runMigrations() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS checks (
       id SERIAL PRIMARY KEY,
-      service_id TEXT REFERENCES services(id) ON DELETE CASCADE,
+      service_id UUID REFERENCES services(id) ON DELETE CASCADE,
       timestamp TIMESTAMPTZ NOT NULL,
       success BOOLEAN NOT NULL,
       status_code INTEGER,
@@ -38,7 +38,7 @@ async function runMigrations() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS incidents (
       id SERIAL PRIMARY KEY,
-      service_id TEXT REFERENCES services(id) ON DELETE CASCADE,
+      service_id UUID REFERENCES services(id) ON DELETE CASCADE,
       started_at TIMESTAMPTZ NOT NULL,
       resolved_at TIMESTAMPTZ,
       duration_seconds INTEGER
